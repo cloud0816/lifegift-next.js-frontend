@@ -1,0 +1,9 @@
+{
+  "totalCost": 45280.50,
+  "totalWaste": 12450.30,
+  "wastePercentage": 27.5,
+  "clusters": 8,
+  "costChange": -12.5,
+  "wasteChange": -8.2
+}
+
