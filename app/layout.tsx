@@ -9,7 +9,10 @@ export const metadata: Metadata = {
   title: "LifeGift",
   description: "LifeGift Application",
   icons: {
-    icon: "/icon.svg",
+    icon: [
+      { url: "/logo-black.svg", media: "(prefers-color-scheme: light)" },
+      { url: "/logo-white.svg", media: "(prefers-color-scheme: dark)" },
+    ],
   },
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "hsl(222.2 47.4% 11.2%)" },

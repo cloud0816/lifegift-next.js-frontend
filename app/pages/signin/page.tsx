@@ -7,7 +7,8 @@ import { useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/app/components/ui/card"
 import { Button } from "@/app/components/ui/button"
 import { Separator } from "@/app/components/ui/separator"
-import { Shield, Lock, TrendingDown } from "lucide-react"
+import { Shield, Lock } from "lucide-react"
+import { Logo } from "@/app/components/logo"
 
 export default function SignInPage() {
   const mockAuth = useMockUser()
@@ -49,8 +50,8 @@ export default function SignInPage() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-8">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1 text-center px-4 pt-6 md:px-6 md:pt-6">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary">
-            <TrendingDown className="h-6 w-6 text-primary-foreground" />
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center">
+            <Logo variant="auto" width={64} height={64} />
           </div>
           <CardTitle className="text-2xl md:text-3xl font-bold">Welcome to LifeGift</CardTitle>
           <CardDescription className="text-sm">

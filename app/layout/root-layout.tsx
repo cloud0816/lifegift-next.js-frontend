@@ -19,8 +19,9 @@ import { isAuth0Configured } from "@/lib/auth-config"
 import { useRouter } from "next/navigation"
 import { Sidebar, MobileSidebar } from "@/app/components/sidebar"
 import { Sheet, SheetContent, SheetTrigger } from "@/app/components/ui/sheet"
-import { Menu, TrendingDown } from "lucide-react"
+import { Menu } from "lucide-react"
 import Link from "next/link"
+import { Logo } from "@/app/components/logo"
 
 export function RootLayout({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false)
@@ -40,7 +41,7 @@ export function RootLayout({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
-  // Update theme-color meta tag when darkMode changes
+  // Update theme-color meta tag and favicon when darkMode changes
   useEffect(() => {
     const themeColorMeta = document.querySelector('meta[name="theme-color"]')
     const themeColor = darkMode 
@@ -55,6 +56,12 @@ export function RootLayout({ children }: { children: React.ReactNode }) {
       meta.content = themeColor
       document.head.appendChild(meta)
     }
+
+    // Update favicon based on theme
+    const favicon = document.querySelector('link[rel="icon"]') as HTMLLinkElement
+    if (favicon) {
+      favicon.href = darkMode ? "/logo-white.svg" : "/logo-black.svg"
+    }
   }, [darkMode])
 
   const toggleDarkMode = () => {
@@ -68,7 +75,7 @@ export function RootLayout({ children }: { children: React.ReactNode }) {
       localStorage.setItem("theme", "light")
     }
     
-    // Update theme-color meta tag immediately
+    // Update theme-color meta tag and favicon immediately
     const themeColorMeta = document.querySelector('meta[name="theme-color"]')
     const themeColor = newDarkMode 
       ? "hsl(222.2 84% 4.9%)" // Dark mode background
@@ -76,6 +83,12 @@ export function RootLayout({ children }: { children: React.ReactNode }) {
     
     if (themeColorMeta) {
       themeColorMeta.setAttribute("content", themeColor)
+    }
+
+    // Update favicon immediately
+    const favicon = document.querySelector('link[rel="icon"]') as HTMLLinkElement
+    if (favicon) {
+      favicon.href = newDarkMode ? "/logo-white.svg" : "/logo-black.svg"
     }
   }
 
@@ -154,9 +167,7 @@ function AuthAwareLayout({
               </SheetContent>
             </Sheet>
             <Link href="/pages/dashboard" className="md:hidden flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                <TrendingDown className="h-5 w-5" />
-              </div>
+              <Logo variant="auto" width={32} height={32} className="h-8 w-8" />
               <span className="text-lg font-semibold">LifeGift</span>
             </Link>
             {!useAuth0 && (
