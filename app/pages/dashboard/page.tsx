@@ -7,7 +7,7 @@ import { useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/app/components/ui/card"
 import { Button } from "@/app/components/ui/button"
 import { Badge } from "@/app/components/ui/badge"
-import { TrendingUp, TrendingDown, DollarSign, Server } from "lucide-react"
+import { TrendingUp, TrendingDown, DollarSign, Server, Leaf, Trash2 } from "lucide-react"
 import Link from "next/link"
 import dashboardData from "@/demo/data/dashboard.json"
 import { useAnimatedNumber } from "@/app/hooks/use-animated-number"
@@ -53,6 +53,11 @@ export default function DashboardPage() {
     decimals: 1,
     formatter: (value) => `${value.toFixed(1)}%`,
   })
+  const animatedCO2Avoided = useAnimatedNumber(mockMetrics.co2Avoided, {
+    duration: 1500,
+    decimals: 1,
+    formatter: (value) => `${value.toFixed(1)} kg`,
+  })
 
   useEffect(() => {
     if (useAuth0 && !isLoading && !user) {
@@ -88,7 +93,7 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      <div className="grid gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-6 md:mb-8">
+      <div className="grid gap-4 md:gap-6 grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 mb-6 md:mb-8">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Cost</CardTitle>
@@ -144,6 +149,19 @@ export default function DashboardPage() {
             </p>
           </CardContent>
         </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">CO2 Avoided</CardTitle>
+            <Leaf className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-500">{animatedCO2Avoided}</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              this month
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-2">
@@ -157,11 +175,13 @@ export default function DashboardPage() {
           <CardContent className="space-y-2">
             <Link href="/pages/waste-report">
               <Button variant="outline" className="w-full justify-start">
+                <Trash2 className="mr-2 h-4 w-4" />
                 View Waste Report
               </Button>
             </Link>
             <Link href="/pages/clusters">
               <Button variant="outline" className="w-full justify-start mt-2">
+                <Server className="mr-2 h-4 w-4" />
                 Manage Clusters
               </Button>
             </Link>

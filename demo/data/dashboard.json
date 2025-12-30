@@ -4,6 +4,7 @@
   "wastePercentage": 27.5,
   "clusters": 8,
   "costChange": -12.5,
-  "wasteChange": -8.2
+  "wasteChange": -8.2,
+  "co2Avoided": 1245.8
 }
 

@@ -33,21 +33,32 @@ export default function ClustersPage() {
     }
   }, [mockAuth.user, mockAuth.isLoading, router])
 
+  // Auto-poll for cluster connections
+  useEffect(() => {
+    // Start listening automatically when component mounts
+    setConnectionStatus("listening")
+    
+    // Poll for connection status every 2 seconds
+    const pollInterval = setInterval(() => {
+      // Simulate checking backend for connection
+      // In real implementation, this would be an API call
+      const shouldConnect = Math.random() > 0.7 // 30% chance to simulate connection
+      
+      if (shouldConnect && connectionStatus === "listening") {
+        setConnectionStatus("connected")
+        setTimeout(() => {
+          setConnectionStatus("idle")
+        }, 2000)
+      }
+    }, 2000)
+
+    return () => clearInterval(pollInterval)
+  }, [connectionStatus])
+
   const handleCopy = () => {
     navigator.clipboard.writeText(helmCommand)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
-  }
-
-  const handleStartListening = () => {
-    setConnectionStatus("listening")
-    // Simulate connection after 3 seconds
-    setTimeout(() => {
-      setConnectionStatus("connected")
-      setTimeout(() => {
-        setConnectionStatus("idle")
-      }, 2000)
-    }, 3000)
   }
 
   if (mockAuth.isLoading) {
@@ -108,28 +119,22 @@ export default function ClustersPage() {
                   )}
                 </Button>
               </div>
-              <div className="flex items-center gap-4">
-                <Button onClick={handleStartListening} disabled={connectionStatus !== "idle"}>
-                  {connectionStatus === "listening" ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Listening for connection...
-                    </>
-                  ) : connectionStatus === "connected" ? (
-                    <>
-                      <Check className="mr-2 h-4 w-4" />
-                      Connected!
-                    </>
-                  ) : (
-                    "Start Listening"
-                  )}
-                </Button>
-                {connectionStatus === "listening" && (
+              {connectionStatus === "listening" && (
+                <div className="flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin text-primary" />
                   <p className="text-sm text-muted-foreground">
-                    Waiting for cluster to connect...
+                    Auto-detecting cluster connection...
                   </p>
-                )}
-              </div>
+                </div>
+              )}
+              {connectionStatus === "connected" && (
+                <div className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-green-500" />
+                  <p className="text-sm text-green-500 font-medium">
+                    Cluster connected successfully!
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -143,7 +148,7 @@ export default function ClustersPage() {
                 <li>Replace <code className="bg-muted px-1 rounded">YOUR_API_KEY</code> with your API key (found in Settings)</li>
                 <li>Replace <code className="bg-muted px-1 rounded">YOUR_CLUSTER_NAME</code> with a descriptive name</li>
                 <li>Run the command in your cluster with kubectl access</li>
-                <li>Click "Start Listening" and wait for the connection</li>
+                <li>The system will automatically detect when your cluster connects</li>
               </ol>
             </CardContent>
           </Card>

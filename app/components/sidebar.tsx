@@ -39,9 +39,9 @@ export function Sidebar() {
               key={item.name}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors relative",
                 isActive
-                  ? "bg-primary text-primary-foreground"
+                  ? "bg-muted dark:bg-gray-800 text-foreground border-l-4 border-blue-500"
                   : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
               )}
             >
@@ -85,9 +85,9 @@ export function MobileSidebar({ onNavigate }: { onNavigate?: () => void }) {
               href={item.href}
               onClick={handleLinkClick}
               className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors relative",
                 isActive
-                  ? "bg-primary text-primary-foreground"
+                  ? "bg-muted dark:bg-gray-800 text-foreground border-l-4 border-blue-500"
                   : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
               )}
             >
