@@ -25,10 +25,9 @@ export function Sidebar() {
 
   return (
     <div className="hidden md:flex h-full w-64 flex-col border-r border-border bg-card">
-      <div className="flex h-16 items-center border-b border-border px-6">
+      <div className="flex h-32 items-center border-b border-border px-6 flex items-center justify-center">
         <Link href="/pages/dashboard" className="flex items-center gap-2">
-          <Logo variant="auto" width={32} height={32} className="h-8 w-8" />
-          <span className="text-lg font-semibold">LifeGift</span>
+          <Logo variant="auto" width={128} height={128} className="h-24 w-24" />
         </Link>
       </div>
       <nav className="flex-1 space-y-1 px-3 py-4">
@@ -41,7 +40,7 @@ export function Sidebar() {
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors relative",
                 isActive
-                  ? "bg-muted dark:bg-gray-800 text-foreground border-l-4 border-blue-500"
+                  ? "dark:bg-gray-800 text-foreground border-l-4 border-blue-500"
                   : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
               )}
             >
@@ -66,14 +65,13 @@ export function MobileSidebar({ onNavigate }: { onNavigate?: () => void }) {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex h-16 items-center border-b border-border px-6">
+      <div className="flex h-32 border-b border-border px-6 items-center justify-center">
         <Link 
           href="/pages/dashboard" 
           className="flex items-center gap-2"
           onClick={handleLinkClick}
         >
-          <Logo variant="auto" width={32} height={32} className="h-8 w-8" />
-          <span className="text-lg font-semibold">LifeGift</span>
+          <Logo variant="auto" width={64} height={64} className="h-24 w-24" />
         </Link>
       </div>
       <nav className="flex-1 space-y-1 px-3 py-4">
@@ -87,7 +85,7 @@ export function MobileSidebar({ onNavigate }: { onNavigate?: () => void }) {
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors relative",
                 isActive
-                  ? "bg-muted dark:bg-gray-800 text-foreground border-l-4 border-blue-500"
+                  ? "dark:bg-gray-800 text-foreground border-l-4 border-blue-500"
                   : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
               )}
             >

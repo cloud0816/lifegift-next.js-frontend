@@ -50,8 +50,8 @@ export default function SignInPage() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-8">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1 text-center px-4 pt-6 md:px-6 md:pt-6">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center">
-            <Logo variant="auto" width={64} height={64} />
+          <div className="mx-auto mb-4 flex h-32 w-32 items-center justify-center">
+            <Logo variant="auto" width={64} height={64} className="h-24 w-24" />
           </div>
           <CardTitle className="text-2xl md:text-3xl font-bold">Welcome to LifeGift</CardTitle>
           <CardDescription className="text-sm">

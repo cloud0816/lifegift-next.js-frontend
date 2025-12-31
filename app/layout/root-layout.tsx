@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { UserProvider } from "@auth0/nextjs-auth0/client"
 import { Moon, Sun, LogOut, User } from "lucide-react"
 import { Button } from "@/app/components/ui/button"
+import { Badge } from "@/app/components/ui/badge"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -166,14 +167,10 @@ function AuthAwareLayout({
                 <MobileSidebar onNavigate={() => setMobileMenuOpen(false)} />
               </SheetContent>
             </Sheet>
-            <Link href="/pages/dashboard" className="md:hidden flex items-center gap-2">
-              <Logo variant="auto" width={32} height={32} className="h-8 w-8" />
-              <span className="text-lg font-semibold">LifeGift</span>
-            </Link>
             {!useAuth0 && (
-              <span className="hidden md:inline-flex text-xs text-muted-foreground px-2 py-1 bg-muted rounded">
+              <Badge variant="outline" className="hidden md:inline-flex">
                 Demo Mode
-              </span>
+              </Badge>
             )}
           </div>
           <div className="flex items-center gap-2 md:gap-4">

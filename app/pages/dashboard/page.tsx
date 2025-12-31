@@ -7,7 +7,7 @@ import { useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/app/components/ui/card"
 import { Button } from "@/app/components/ui/button"
 import { Badge } from "@/app/components/ui/badge"
-import { TrendingUp, TrendingDown, DollarSign, Server, Leaf, Trash2 } from "lucide-react"
+import { TrendingUp, TrendingDown, DollarSign, Server, Leaf, BarChart3 } from "lucide-react"
 import Link from "next/link"
 import dashboardData from "@/demo/data/dashboard.json"
 import { useAnimatedNumber } from "@/app/hooks/use-animated-number"
@@ -93,7 +93,7 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      <div className="grid gap-4 md:gap-6 grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 mb-6 md:mb-8">
+      <div className="grid gap-4 md:gap-6 grid-cols-2 lg:grid-cols-5 mb-6 md:mb-8">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Cost</CardTitle>
@@ -175,7 +175,7 @@ export default function DashboardPage() {
           <CardContent className="space-y-2">
             <Link href="/pages/waste-report">
               <Button variant="outline" className="w-full justify-start">
-                <Trash2 className="mr-2 h-4 w-4" />
+                <BarChart3 className="mr-2 h-4 w-4" />
                 View Waste Report
               </Button>
             </Link>
@@ -200,20 +200,20 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium">Cluster connected</p>
-                  <p className="text-xs text-muted-foreground">2 hours ago</p>
+                  <p className="text-xs text-muted-foreground/60">2 hours ago</p>
                 </div>
                 <Badge variant="secondary">New</Badge>
               </div>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium">Waste report generated</p>
-                  <p className="text-xs text-muted-foreground">1 day ago</p>
+                  <p className="text-xs text-muted-foreground/60">1 day ago</p>
                 </div>
               </div>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium">Cost optimization applied</p>
-                  <p className="text-xs text-muted-foreground">3 days ago</p>
+                  <p className="text-xs text-muted-foreground/60">3 days ago</p>
                 </div>
                 <Badge variant="outline">Optimized</Badge>
               </div>

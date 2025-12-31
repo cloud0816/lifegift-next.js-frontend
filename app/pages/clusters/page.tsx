@@ -38,7 +38,7 @@ export default function ClustersPage() {
     // Start listening automatically when component mounts
     setConnectionStatus("listening")
     
-    // Poll for connection status every 2 seconds
+    // Poll for connection status every 5 seconds
     const pollInterval = setInterval(() => {
       // Simulate checking backend for connection
       // In real implementation, this would be an API call
@@ -50,7 +50,7 @@ export default function ClustersPage() {
           setConnectionStatus("idle")
         }, 2000)
       }
-    }, 2000)
+    }, 5000)
 
     return () => clearInterval(pollInterval)
   }, [connectionStatus])
