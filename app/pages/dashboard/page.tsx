@@ -53,6 +53,11 @@ export default function DashboardPage() {
     decimals: 1,
     formatter: (value) => `${value.toFixed(1)}%`,
   })
+  const animatedWastePercentageChange = useAnimatedNumber(Math.abs(mockMetrics.wastePercentageChange), {
+    duration: 1500,
+    decimals: 1,
+    formatter: (value) => `${value.toFixed(1)}%`,
+  })
   const animatedCO2Avoided = useAnimatedNumber(mockMetrics.co2Avoided, {
     duration: 1500,
     decimals: 1,
@@ -131,8 +136,19 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{animatedWastePercentage}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              of total cost
+            <p className="text-xs text-muted-foreground flex items-center mt-1">
+              {mockMetrics.wastePercentageChange < 0 ? (
+                <>
+                  <TrendingDown className="h-3 w-3 text-green-500 mr-1" />
+                  <span className="text-green-500">{animatedWastePercentageChange}</span>
+                </>
+              ) : (
+                <>
+                  <TrendingUp className="h-3 w-3 text-red-500 mr-1" />
+                  <span className="text-red-500">{animatedWastePercentageChange}</span>
+                </>
+              )}
+              <span className="ml-1">vs last month</span>
             </p>
           </CardContent>
         </Card>
