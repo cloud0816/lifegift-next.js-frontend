@@ -10,6 +10,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/app/components/ui/ta
 import { TrendingDown, AlertTriangle, DollarSign } from "lucide-react"
 import wasteReportData from "@/demo/data/waste-report.json"
 import { useAnimatedNumber } from "@/app/hooks/use-animated-number"
+import {
+  LineChart,
+  Line,
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts"
 
 const mockWasteData = wasteReportData
 
@@ -140,39 +154,100 @@ export default function WasteReportPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
-                  <div>
-                    <p className="text-sm font-medium mb-2">Total Cost Trend</p>
-                    <div className="space-y-2">
-                      {mockWasteData.monthlyTrend.map((item) => (
-                        <div key={item.month} className="flex items-center justify-between">
-                          <span className="text-sm text-muted-foreground">{item.month}</span>
-                          <span className="font-medium">${item.cost.toLocaleString()}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium mb-2">Waste Trend</p>
-                    <div className="space-y-2">
-                      {mockWasteData.monthlyTrend.map((item) => (
-                        <div key={item.month} className="flex items-center justify-between">
-                          <span className="text-sm text-muted-foreground">{item.month}</span>
-                          <span className="font-medium text-destructive">${item.waste.toLocaleString()}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-                <div className="pt-4 border-t">
-                  <p className="text-xs text-muted-foreground">
-                    Note: Chart visualization will be implemented with Recharts or Tremor.so
-                  </p>
-                </div>
-              </div>
+              <ResponsiveContainer width="100%" height={400}>
+                <AreaChart data={mockWasteData.monthlyTrend}>
+                  <defs>
+                    <linearGradient id="colorCost" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="#8884d8" stopOpacity={0}/>
+                    </linearGradient>
+                    <linearGradient id="colorWaste" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#ff7300" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="#ff7300" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip 
+                    formatter={(value: number | undefined) => value !== undefined ? `$${value.toLocaleString()}` : ''}
+                    contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}
+                  />
+                  <Legend />
+                  <Area 
+                    type="monotone" 
+                    dataKey="cost" 
+                    stroke="#8884d8" 
+                    fillOpacity={1} 
+                    fill="url(#colorCost)"
+                    name="Total Cost"
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="waste" 
+                    stroke="#ff7300" 
+                    fillOpacity={1} 
+                    fill="url(#colorWaste)"
+                    name="Waste"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
             </CardContent>
           </Card>
+
+          <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>Cost Trend</CardTitle>
+                <CardDescription>
+                  Monthly cost overview
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={250}>
+                  <LineChart data={mockWasteData.monthlyTrend}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip 
+                      formatter={(value: number | undefined) => value !== undefined ? `$${value.toLocaleString()}` : ''}
+                      contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="cost" 
+                      stroke="#8884d8" 
+                      strokeWidth={2}
+                      name="Cost"
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Waste Trend</CardTitle>
+                <CardDescription>
+                  Monthly waste overview
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={250}>
+                  <BarChart data={mockWasteData.monthlyTrend}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip 
+                      formatter={(value: number | undefined) => value !== undefined ? `$${value.toLocaleString()}` : ''}
+                      contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}
+                    />
+                    <Bar dataKey="waste" fill="#ff7300" name="Waste" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
       </Tabs>
     </div>

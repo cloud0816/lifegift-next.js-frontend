@@ -227,7 +227,7 @@ function UserMenu({ useAuth0 }: { useAuth0: boolean }) {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-10 w-10 rounded-full">
           <Avatar className="h-10 w-10">
-            <AvatarImage src={user.picture} alt={user.name || "User"} />
+            <AvatarImage src={user.picture || undefined} alt={user.name || "User"} />
             <AvatarFallback>
               {user.name?.charAt(0).toUpperCase() || "U"}
             </AvatarFallback>
