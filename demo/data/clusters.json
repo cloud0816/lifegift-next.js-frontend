@@ -1,0 +1,39 @@
+[
+  {
+    "id": 1,
+    "name": "production-cluster-1",
+    "status": "connected",
+    "lastSeen": "2 minutes ago",
+    "nodes": 12,
+    "totalCost": 18500.50,
+    "waste": 4850.20
+  },
+  {
+    "id": 2,
+    "name": "staging-cluster",
+    "status": "connected",
+    "lastSeen": "5 minutes ago",
+    "nodes": 6,
+    "totalCost": 9200.30,
+    "waste": 1890.20
+  },
+  {
+    "id": 3,
+    "name": "dev-cluster",
+    "status": "connected",
+    "lastSeen": "1 hour ago",
+    "nodes": 3,
+    "totalCost": 3200.80,
+    "waste": 980.40
+  },
+  {
+    "id": 4,
+    "name": "production-cluster-2",
+    "status": "pending",
+    "lastSeen": "Never",
+    "nodes": 0,
+    "totalCost": 0,
+    "waste": 0
+  }
+]
+

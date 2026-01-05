@@ -1,0 +1,60 @@
+{
+  "totalWaste": 12450.30,
+  "wastePercentage": 27.5,
+  "monthlyTrend": [
+    { "month": "Jan", "cost": 52000, "waste": 15000 },
+    { "month": "Feb", "cost": 51000, "waste": 14500 },
+    { "month": "Mar", "cost": 49500, "waste": 13800 },
+    { "month": "Apr", "cost": 48000, "waste": 13200 },
+    { "month": "May", "cost": 46500, "waste": 12800 },
+    { "month": "Jun", "cost": 45280, "waste": 12450 }
+  ],
+  "inefficiencies": [
+    {
+      "id": 1,
+      "cluster": "production-cluster-1",
+      "namespace": "default",
+      "resource": "nginx-deployment",
+      "type": "Over-provisioned",
+      "waste": 2450.50,
+      "recommendation": "Reduce CPU requests by 40%"
+    },
+    {
+      "id": 2,
+      "cluster": "staging-cluster",
+      "namespace": "monitoring",
+      "resource": "prometheus-server",
+      "type": "Idle resources",
+      "waste": 1890.20,
+      "recommendation": "Scale down during off-hours"
+    },
+    {
+      "id": 3,
+      "cluster": "production-cluster-1",
+      "namespace": "data-processing",
+      "resource": "spark-worker",
+      "type": "Underutilized",
+      "waste": 1650.80,
+      "recommendation": "Right-size based on actual usage"
+    },
+    {
+      "id": 4,
+      "cluster": "dev-cluster",
+      "namespace": "testing",
+      "resource": "test-pods",
+      "type": "Orphaned resources",
+      "waste": 980.40,
+      "recommendation": "Clean up unused test resources"
+    },
+    {
+      "id": 5,
+      "cluster": "production-cluster-2",
+      "namespace": "cache",
+      "resource": "redis-cluster",
+      "type": "Over-provisioned",
+      "waste": 2150.90,
+      "recommendation": "Optimize memory allocation"
+    }
+  ]
+}
+
