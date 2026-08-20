@@ -1,0 +1,69 @@
+{
+  "enabled": true,
+  "defaultStrategy": "balanced",
+  "strategies": [
+    { "id": "balanced", "name": "Balanced", "description": "Balance between cost and availability" },
+    { "id": "costOptimized", "name": "Cost Optimized", "description": "Maximize cost savings" },
+    { "id": "availabilityOptimized", "name": "Availability Optimized", "description": "Maximize availability" }
+  ],
+  "clusterConfigs": [
+    {
+      "clusterId": 1,
+      "clusterName": "production-cluster-1",
+      "spotEnabled": true,
+      "strategy": "balanced",
+      "maxPrice": 0.15,
+      "interruptionRate": 5,
+      "estimatedSavings": 1850.50,
+      "spotUsage": 45
+    },
+    {
+      "clusterId": 2,
+      "clusterName": "staging-cluster",
+      "spotEnabled": true,
+      "strategy": "costOptimized",
+      "maxPrice": 0.12,
+      "interruptionRate": 8,
+      "estimatedSavings": 920.30,
+      "spotUsage": 65
+    },
+    {
+      "clusterId": 3,
+      "clusterName": "dev-cluster",
+      "spotEnabled": true,
+      "strategy": "costOptimized",
+      "maxPrice": 0.10,
+      "interruptionRate": 12,
+      "estimatedSavings": 480.20,
+      "spotUsage": 80
+    },
+    {
+      "clusterId": 4,
+      "clusterName": "production-cluster-2",
+      "spotEnabled": false,
+      "strategy": "balanced",
+      "maxPrice": 0.15,
+      "interruptionRate": 0,
+      "estimatedSavings": 0,
+      "spotUsage": 0
+    }
+  ],
+  "statistics": {
+    "totalSavings": 3251.00,
+    "averageSavingsPercentage": 35,
+    "totalInterruptions": 23,
+    "availability": 97.5,
+    "spotInstancesCount": 48,
+    "onDemandInstancesCount": 32
+  },
+  "pricingHistory": [
+    { "date": "2024-06-01", "averagePrice": 0.14, "availability": 95 },
+    { "date": "2024-06-02", "averagePrice": 0.13, "availability": 96 },
+    { "date": "2024-06-03", "averagePrice": 0.15, "availability": 94 },
+    { "date": "2024-06-04", "averagePrice": 0.12, "availability": 97 },
+    { "date": "2024-06-05", "averagePrice": 0.14, "availability": 95 },
+    { "date": "2024-06-06", "averagePrice": 0.13, "availability": 96 },
+    { "date": "2024-06-07", "averagePrice": 0.14, "availability": 95 }
+  ]
+}
+
