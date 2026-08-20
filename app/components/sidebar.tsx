@@ -7,13 +7,15 @@ import {
   TrendingDown, 
   Server, 
   Settings,
-  BarChart3
+  BarChart3,
+  Lightbulb
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Logo } from "@/app/components/logo"
 
 export const navigation = [
   { name: "Overview", href: "/pages/dashboard", icon: LayoutDashboard },
+  { name: "Recommendations", href: "/pages/recommendations", icon: Lightbulb },
   { name: "Waste Report", href: "/pages/waste-report", icon: TrendingDown },
   { name: "Clusters", href: "/pages/clusters", icon: Server },
   { name: "Analytics", href: "/pages/analytics", icon: BarChart3 },

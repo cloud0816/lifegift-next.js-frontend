@@ -1,36 +1,77 @@
 "use client"
 
-import { useMockUser } from "@/app/providers/mock-auth-provider"
+import { useAuth } from "@/app/providers/auth-provider"
 import { useRouter } from "next/navigation"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/app/components/ui/card"
 import { Badge } from "@/app/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/app/components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/app/components/ui/tabs"
-import { TrendingDown, AlertTriangle, DollarSign } from "lucide-react"
-import wasteReportData from "@/demo/data/waste-report.json"
+import { Button } from "@/app/components/ui/button"
+import { TrendingDown, AlertTriangle, DollarSign, Loader2 } from "lucide-react"
+import { recommendationsApi, Recommendation } from "@/lib/api-client"
 import { useAnimatedNumber } from "@/app/hooks/use-animated-number"
-
-const mockWasteData = wasteReportData
+import {
+  LineChart,
+  Line,
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts"
 
 export default function WasteReportPage() {
-  const mockAuth = useMockUser()
+  const auth = useAuth()
   const router = useRouter()
+  const [recommendations, setRecommendations] = useState<Recommendation[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
+
+  useEffect(() => {
+    if (!auth.isLoading && !auth.user) {
+      router.push("/pages/signin")
+    }
+  }, [auth.user, auth.isLoading, router])
+
+  useEffect(() => {
+    if (auth.user) {
+      loadRecommendations()
+    }
+  }, [auth.user])
+
+  const loadRecommendations = async () => {
+    try {
+      setIsLoading(true)
+      setError(null)
+      const data = await recommendationsApi.listRecommendations({ limit: 100 })
+      setRecommendations(data.recommendations)
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Failed to load recommendations'))
+      console.error('Failed to load recommendations:', err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Calculate total waste from recommendations
+  const totalWaste = recommendations.reduce((sum, rec) => sum + rec.savings_monthly_usd, 0)
+  const totalCost = totalWaste * 3.33 // Estimate total cost (30% waste)
+  const wastePercentage = totalCost > 0 ? (totalWaste / totalCost) * 100 : 0
 
   // Animated Total Waste
-  const animatedTotalWaste = useAnimatedNumber(mockWasteData.totalWaste, {
+  const animatedTotalWaste = useAnimatedNumber(totalWaste, {
     duration: 1500,
     decimals: 2,
     formatter: (value) => `$${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
   })
 
-  useEffect(() => {
-    if (!mockAuth.isLoading && !mockAuth.user) {
-      router.push("/pages/signin")
-    }
-  }, [mockAuth.user, mockAuth.isLoading, router])
-
-  if (mockAuth.isLoading) {
+  if (auth.isLoading || isLoading) {
     return (
       <div className="p-8">
         <div className="flex items-center justify-center min-h-[60vh]">
@@ -43,8 +84,26 @@ export default function WasteReportPage() {
     )
   }
 
-  if (!mockAuth.user) {
+  if (!auth.user) {
     return null
+  }
+
+  if (error) {
+    return (
+      <div className="p-8">
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle>Error Loading Recommendations</CardTitle>
+              <CardDescription>{error.message}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button onClick={loadRecommendations}>Retry</Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -65,14 +124,14 @@ export default function WasteReportPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex items-baseline gap-4">
-              <div className="text-4xl font-bold">{animatedTotalWaste}</div>
-              <div className="flex items-center gap-2">
-                <Badge variant="destructive" className="text-sm">
-                  {mockWasteData.wastePercentage}% of total cost
-                </Badge>
+              <div className="flex items-baseline gap-4">
+                <div className="text-4xl font-bold">{animatedTotalWaste}</div>
+                <div className="flex items-center gap-2">
+                  <Badge variant="destructive" className="text-sm">
+                    {wastePercentage.toFixed(1)}% of total cost
+                  </Badge>
+                </div>
               </div>
-            </div>
             <p className="text-sm text-muted-foreground mt-4">
               Potential savings if all inefficiencies are addressed
             </p>
@@ -103,27 +162,35 @@ export default function WasteReportPage() {
                       <TableHead className="min-w-[120px]">Namespace</TableHead>
                       <TableHead className="min-w-[150px]">Resource</TableHead>
                       <TableHead className="min-w-[140px]">Type</TableHead>
-                      <TableHead className="text-right min-w-[100px]">Waste</TableHead>
+                      <TableHead className="text-right min-w-[100px]">Monthly Savings</TableHead>
                       <TableHead className="min-w-[200px]">Recommendation</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {mockWasteData.inefficiencies.map((item) => (
-                      <TableRow key={item.id}>
-                        <TableCell className="font-medium">{item.cluster}</TableCell>
-                        <TableCell>{item.namespace}</TableCell>
-                        <TableCell>{item.resource}</TableCell>
-                        <TableCell>
-                          <Badge variant="outline">{item.type}</Badge>
-                        </TableCell>
-                        <TableCell className="text-right font-medium">
-                          ${item.waste.toLocaleString()}
-                        </TableCell>
-                        <TableCell className="text-sm text-muted-foreground">
-                          {item.recommendation}
+                    {recommendations.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                          No recommendations found. Connect clusters to see waste analysis.
                         </TableCell>
                       </TableRow>
-                    ))}
+                    ) : (
+                      recommendations.map((rec) => (
+                        <TableRow key={rec.id}>
+                          <TableCell className="font-medium">{rec.cluster_id}</TableCell>
+                          <TableCell>{rec.namespace}</TableCell>
+                          <TableCell>{rec.resource_name}</TableCell>
+                          <TableCell>
+                            <Badge variant="outline">{rec.resource_kind}</Badge>
+                          </TableCell>
+                          <TableCell className="text-right font-medium">
+                            ${rec.savings_monthly_usd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </TableCell>
+                          <TableCell className="text-sm text-muted-foreground">
+                            Reduce CPU from {rec.current_cpu} to {rec.recommended_cpu} ({rec.waste_percentage}% waste)
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
                   </TableBody>
                 </Table>
               </div>
@@ -134,40 +201,33 @@ export default function WasteReportPage() {
         <TabsContent value="trends" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Cost & Waste Trends</CardTitle>
+              <CardTitle>Recommendations Summary</CardTitle>
               <CardDescription>
-                6-month historical view
+                Overview of CPU rightsizing recommendations
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
-                  <div>
-                    <p className="text-sm font-medium mb-2">Total Cost Trend</p>
-                    <div className="space-y-2">
-                      {mockWasteData.monthlyTrend.map((item) => (
-                        <div key={item.month} className="flex items-center justify-between">
-                          <span className="text-sm text-muted-foreground">{item.month}</span>
-                          <span className="font-medium">${item.cost.toLocaleString()}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium mb-2">Waste Trend</p>
-                    <div className="space-y-2">
-                      {mockWasteData.monthlyTrend.map((item) => (
-                        <div key={item.month} className="flex items-center justify-between">
-                          <span className="text-sm text-muted-foreground">{item.month}</span>
-                          <span className="font-medium text-destructive">${item.waste.toLocaleString()}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">Total Recommendations</p>
+                  <p className="text-2xl font-bold">{recommendations.length}</p>
                 </div>
-                <div className="pt-4 border-t">
-                  <p className="text-xs text-muted-foreground">
-                    Note: Chart visualization will be implemented with Recharts or Tremor.so
+                <div>
+                  <p className="text-sm text-muted-foreground">Pending</p>
+                  <p className="text-2xl font-bold text-yellow-600">
+                    {recommendations.filter(r => r.status === 'pending').length}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Applied</p>
+                  <p className="text-2xl font-bold text-green-600">
+                    {recommendations.filter(r => r.status === 'applied').length}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Failed</p>
+                  <p className="text-2xl font-bold text-red-600">
+                    {recommendations.filter(r => r.status === 'failed').length}
                   </p>
                 </div>
               </div>

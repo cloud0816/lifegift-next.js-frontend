@@ -58,3 +58,7 @@
   }
 }
 
+.pie-chart .recharts-tooltip-item {
+  color: hsl(var(--card-foreground)) !important;
+}
+

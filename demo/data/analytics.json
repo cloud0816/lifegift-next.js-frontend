@@ -1,0 +1,48 @@
+{
+  "costTrends": [
+    { "month": "Jan", "totalCost": 52000, "waste": 15000, "savings": 37000 },
+    { "month": "Feb", "totalCost": 51000, "waste": 14500, "savings": 36500 },
+    { "month": "Mar", "totalCost": 49500, "waste": 13800, "savings": 35700 },
+    { "month": "Apr", "totalCost": 48000, "waste": 13200, "savings": 34800 },
+    { "month": "May", "totalCost": 46500, "waste": 12800, "savings": 33700 },
+    { "month": "Jun", "totalCost": 45280, "waste": 12450, "savings": 32830 }
+  ],
+  "wasteByCluster": [
+    { "cluster": "production-cluster-1", "waste": 4850.20, "cost": 18500.50 },
+    { "cluster": "staging-cluster", "waste": 1890.20, "cost": 9200.30 },
+    { "cluster": "dev-cluster", "waste": 980.40, "cost": 3200.80 },
+    { "cluster": "production-cluster-2", "waste": 2150.90, "cost": 8500.20 },
+    { "cluster": "test-cluster", "waste": 578.60, "cost": 1879.70 }
+  ],
+  "wasteByType": [
+    { "type": "Over-provisioned", "waste": 4601.40, "count": 12 },
+    { "type": "Idle resources", "waste": 3210.80, "count": 8 },
+    { "type": "Underutilized", "waste": 2450.20, "count": 15 },
+    { "type": "Orphaned resources", "waste": 1187.90, "count": 5 }
+  ],
+  "resourceUtilization": [
+    { "namespace": "default", "cpu": 45, "memory": 52, "cost": 8500 },
+    { "namespace": "monitoring", "cpu": 38, "memory": 42, "cost": 6200 },
+    { "namespace": "data-processing", "cpu": 72, "memory": 68, "cost": 12000 },
+    { "namespace": "cache", "cpu": 28, "memory": 65, "cost": 5500 },
+    { "namespace": "testing", "cpu": 15, "memory": 22, "cost": 1800 },
+    { "namespace": "production", "cpu": 68, "memory": 71, "cost": 11280 }
+  ],
+  "costBreakdown": [
+    { "category": "Compute", "cost": 28000, "percentage": 61.8 },
+    { "category": "Storage", "cost": 8500, "percentage": 18.8 },
+    { "category": "Network", "cost": 4500, "percentage": 9.9 },
+    { "category": "Database", "cost": 3200, "percentage": 7.1 },
+    { "category": "Other", "cost": 1080, "percentage": 2.4 }
+  ],
+  "dailyCosts": [
+    { "day": "Mon", "cost": 2150, "waste": 580 },
+    { "day": "Tue", "cost": 2180, "waste": 595 },
+    { "day": "Wed", "cost": 2120, "waste": 570 },
+    { "day": "Thu", "cost": 2240, "waste": 610 },
+    { "day": "Fri", "cost": 2210, "waste": 600 },
+    { "day": "Sat", "cost": 1980, "waste": 520 },
+    { "day": "Sun", "cost": 1900, "waste": 495 }
+  ]
+}
+
