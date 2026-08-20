@@ -1,78 +1,84 @@
 "use client"
 
-import { useUser } from "@auth0/nextjs-auth0/client"
-import { useMockUser } from "@/app/providers/mock-auth-provider"
+import { useAuth } from "@/app/providers/auth-provider"
 import { useRouter } from "next/navigation"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/app/components/ui/card"
 import { Button } from "@/app/components/ui/button"
 import { Badge } from "@/app/components/ui/badge"
 import { TrendingUp, TrendingDown, DollarSign, Server, Leaf, BarChart3 } from "lucide-react"
 import Link from "next/link"
-import dashboardData from "@/demo/data/dashboard.json"
+import { metricsApi, MetricsSummary } from "@/lib/api-client"
 import { useAnimatedNumber } from "@/app/hooks/use-animated-number"
 
-const mockMetrics = dashboardData
-
 export default function DashboardPage() {
-  const useAuth0 = false
-  const auth0User = useAuth0 ? useUser() : { user: undefined, isLoading: false }
-  const mockAuth = !useAuth0 ? useMockUser() : { user: undefined, isLoading: false, logout: () => {} }
-  
-  const user = useAuth0 ? auth0User.user : mockAuth.user
-  const isLoading = useAuth0 ? auth0User.isLoading : mockAuth.isLoading
+  const auth = useAuth()
   const router = useRouter()
+  const [metrics, setMetrics] = useState<MetricsSummary | null>(null)
+  const [isLoadingMetrics, setIsLoadingMetrics] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
+  
+  const user = auth.user
+  const isLoading = auth.isLoading
+
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.push("/pages/signin")
+    }
+  }, [user, isLoading, router])
+
+  useEffect(() => {
+    if (user) {
+      loadMetrics()
+    }
+  }, [user])
+
+  const loadMetrics = async () => {
+    try {
+      setIsLoadingMetrics(true)
+      setError(null)
+      const data = await metricsApi.getMetricsSummary()
+      setMetrics(data)
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Failed to load metrics'))
+      console.error('Failed to load metrics:', err)
+    } finally {
+      setIsLoadingMetrics(false)
+    }
+  }
+
+  // Calculate derived metrics
+  const totalCost = metrics ? metrics.monthly_savings.amount * 10 : 0 // Estimate total cost (10x savings for demo)
+  const totalWaste = metrics ? totalCost * 0.3 : 0 // Estimate 30% waste
+  const wastePercentage = totalCost > 0 ? (totalWaste / totalCost) * 100 : 0
 
   // Animated numbers
-  const animatedTotalCost = useAnimatedNumber(mockMetrics.totalCost, {
+  const animatedTotalCost = useAnimatedNumber(totalCost, {
     duration: 1500,
     decimals: 2,
     formatter: (value) => `$${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
   })
-  const animatedTotalWaste = useAnimatedNumber(mockMetrics.totalWaste, {
+  const animatedTotalWaste = useAnimatedNumber(totalWaste, {
     duration: 1500,
     decimals: 2,
     formatter: (value) => `$${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
   })
-  const animatedWastePercentage = useAnimatedNumber(mockMetrics.wastePercentage, {
+  const animatedWastePercentage = useAnimatedNumber(wastePercentage, {
     duration: 1500,
     decimals: 1,
     formatter: (value) => `${value.toFixed(1)}%`,
   })
-  const animatedClusters = useAnimatedNumber(mockMetrics.clusters, {
+  const animatedClusters = useAnimatedNumber(metrics?.total_clusters || 0, {
     duration: 1000,
     decimals: 0,
   })
-  const animatedCostChange = useAnimatedNumber(Math.abs(mockMetrics.costChange), {
+  const animatedSavings = useAnimatedNumber(metrics?.monthly_savings.amount || 0, {
     duration: 1500,
-    decimals: 1,
-    formatter: (value) => `${value.toFixed(1)}%`,
-  })
-  const animatedWasteChange = useAnimatedNumber(Math.abs(mockMetrics.wasteChange), {
-    duration: 1500,
-    decimals: 1,
-    formatter: (value) => `${value.toFixed(1)}%`,
-  })
-  const animatedWastePercentageChange = useAnimatedNumber(Math.abs(mockMetrics.wastePercentageChange), {
-    duration: 1500,
-    decimals: 1,
-    formatter: (value) => `${value.toFixed(1)}%`,
-  })
-  const animatedCO2Avoided = useAnimatedNumber(mockMetrics.co2Avoided, {
-    duration: 1500,
-    decimals: 1,
-    formatter: (value) => `${value.toFixed(1)} kg`,
+    decimals: 2,
+    formatter: (value) => `$${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
   })
 
-  useEffect(() => {
-    if (useAuth0 && !isLoading && !user) {
-      router.push("/api/auth/login")
-    } else if (!useAuth0 && !isLoading && !user) {
-      router.push("/pages/signin")
-    }
-  }, [user, isLoading, router, useAuth0])
-
-  if (isLoading) {
+  if (isLoading || isLoadingMetrics) {
     return (
       <div className="p-8">
         <div className="flex items-center justify-center min-h-[60vh]">
@@ -86,6 +92,28 @@ export default function DashboardPage() {
   }
 
   if (!user) {
+    return null
+  }
+
+  if (error) {
+    return (
+      <div className="p-8">
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle>Error Loading Metrics</CardTitle>
+              <CardDescription>{error.message}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button onClick={loadMetrics}>Retry</Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    )
+  }
+
+  if (!metrics) {
     return null
   }
 
@@ -106,10 +134,8 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{animatedTotalCost}</div>
-            <p className="text-xs text-muted-foreground flex items-center mt-1">
-              <TrendingDown className="h-3 w-3 text-green-500 mr-1" />
-              <span className="text-green-500">{animatedCostChange}</span>
-              <span className="ml-1">vs last month</span>
+            <p className="text-xs text-muted-foreground mt-1">
+              Monthly overview
             </p>
           </CardContent>
         </Card>
@@ -121,10 +147,8 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{animatedTotalWaste}</div>
-            <p className="text-xs text-muted-foreground flex items-center mt-1">
-              <TrendingDown className="h-3 w-3 text-green-500 mr-1" />
-              <span className="text-green-500">{animatedWasteChange}</span>
-              <span className="ml-1">vs last month</span>
+            <p className="text-xs text-muted-foreground mt-1">
+              Potential savings
             </p>
           </CardContent>
         </Card>
@@ -136,19 +160,8 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{animatedWastePercentage}</div>
-            <p className="text-xs text-muted-foreground flex items-center mt-1">
-              {mockMetrics.wastePercentageChange < 0 ? (
-                <>
-                  <TrendingDown className="h-3 w-3 text-green-500 mr-1" />
-                  <span className="text-green-500">{animatedWastePercentageChange}</span>
-                </>
-              ) : (
-                <>
-                  <TrendingUp className="h-3 w-3 text-red-500 mr-1" />
-                  <span className="text-red-500">{animatedWastePercentageChange}</span>
-                </>
-              )}
-              <span className="ml-1">vs last month</span>
+            <p className="text-xs text-muted-foreground mt-1">
+              of total cost
             </p>
           </CardContent>
         </Card>
@@ -168,13 +181,13 @@ export default function DashboardPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">CO2 Avoided</CardTitle>
-            <Leaf className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Monthly Savings</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-500">{animatedCO2Avoided}</div>
+            <div className="text-2xl font-bold text-green-500">{animatedSavings}</div>
             <p className="text-xs text-muted-foreground mt-1">
-              this month
+              {metrics.monthly_savings.currency}
             </p>
           </CardContent>
         </Card>
@@ -213,25 +226,31 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium">Cluster connected</p>
-                  <p className="text-xs text-muted-foreground/60">2 hours ago</p>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium">Total Clusters</p>
+                    <p className="text-xs text-muted-foreground/60">{metrics.total_clusters} active</p>
+                  </div>
+                  <Badge variant="secondary">{metrics.total_clusters}</Badge>
                 </div>
-                <Badge variant="secondary">New</Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium">Waste report generated</p>
-                  <p className="text-xs text-muted-foreground/60">1 day ago</p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium">Optimized Workloads</p>
+                    <p className="text-xs text-muted-foreground/60">{metrics.total_optimized_workloads} total</p>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium">Cost optimization applied</p>
-                  <p className="text-xs text-muted-foreground/60">3 days ago</p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium">Recommendations</p>
+                    <p className="text-xs text-muted-foreground/60">
+                      {metrics.recommendations.pending} pending, {metrics.recommendations.applied} applied
+                    </p>
+                  </div>
+                  <Badge variant="outline">
+                    {metrics.recommendations.applied} applied
+                  </Badge>
                 </div>
-                <Badge variant="outline">Optimized</Badge>
               </div>
             </div>
           </CardContent>

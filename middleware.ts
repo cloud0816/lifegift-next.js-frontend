@@ -13,8 +13,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // For now, allow all other routes (pages handle auth redirects)
-  // This can be enhanced later with actual Auth0 middleware protection
+  // Allow all other routes (pages handle auth redirects via auth provider)
   return NextResponse.next();
 }
 

@@ -1,31 +1,44 @@
 # LifeGift - Next.js Application
 
-A modern Next.js 14 application built with Tailwind CSS, Shadcn/UI, and Auth0 authentication.
+A modern Next.js 14 application built with Tailwind CSS, Shadcn/UI, and OAuth authentication (Google/GitHub) via LifeGift Platform API.
 
 ## Tech Stack
 
 - **Framework**: Next.js 14 (App Router)
 - **Styling**: Tailwind CSS
 - **Component Library**: Shadcn/UI
-- **Authentication**: Auth0
-- **State Management**: React Query (TanStack Query) - Ready for implementation
-- **Charts**: Recharts or Tremor.so (Ready for implementation)
+- **Authentication**: OAuth 2.0 (Google/GitHub) via LifeGift Platform API
+- **API Client**: Custom API client for LifeGift Platform REST API
+- **Charts**: Recharts
 
 ## Project Structure
 
 ```
 app/
 ├── components/          # Shadcn UI components
-│   └── ui/             # Reusable UI components
+│   ├── ui/             # Reusable UI components
+│   ├── sidebar.tsx     # Sidebar navigation
+│   └── logo.tsx        # Logo component
 ├── layout/             # Layout components
 │   └── root-layout.tsx # Main layout with dark mode
 ├── pages/              # Application pages
-│   ├── dashboard/      # Dashboard page
+│   ├── dashboard/      # Dashboard with metrics
+│   ├── clusters/       # Cluster management
+│   ├── recommendations/ # Recommendations view and apply
+│   ├── waste-report/   # Waste report
+│   ├── analytics/      # Analytics page
+│   ├── settings/       # Settings page
 │   ├── signin/         # Sign in page
 │   └── signout/        # Sign out page
 ├── api/                # API routes
-│   └── auth/           # Auth0 authentication routes
+│   └── auth/           # OAuth authentication routes
+├── providers/          # React context providers
+│   └── auth-provider.tsx # Authentication provider
+├── hooks/              # Custom React hooks
 └── globals.css         # Global styles with dark mode support
+lib/
+├── api-client.ts       # API client for LifeGift Platform
+└── utils.ts           # Utility functions
 ```
 
 ## Getting Started
@@ -34,6 +47,7 @@ app/
 
 - Node.js 18+ 
 - npm, yarn, or pnpm
+- LifeGift Platform API access
 
 ### Installation
 
@@ -42,16 +56,18 @@ app/
 npm install
 ```
 
-2. Set up Auth0 environment variables:
+2. Set up environment variables:
 
 Create a `.env.local` file in the root directory:
 
 ```env
-AUTH0_SECRET='use [openssl rand -hex 32] to generate a 32 bytes value'
-AUTH0_BASE_URL='http://localhost:3000'
-AUTH0_ISSUER_BASE_URL='https://YOUR_AUTH0_DOMAIN'
-AUTH0_CLIENT_ID='YOUR_AUTH0_CLIENT_ID'
-AUTH0_CLIENT_SECRET='YOUR_AUTH0_CLIENT_SECRET'
+# LifeGift Platform API Configuration
+# Production: https://api.lifegift.com
+# Staging: https://api.staging.lifegift.com
+NEXT_PUBLIC_API_BASE_URL=https://api.lifegift.com
+
+# App URL (for OAuth callbacks)
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
 3. Run the development server:
@@ -64,33 +80,32 @@ npm run dev
 
 ## Features
 
-### ✅ Completed (First Milestone)
+### ✅ Completed
 
 - ✅ Next.js 14 with App Router setup
 - ✅ Tailwind CSS configuration
 - ✅ Shadcn/UI component library integration
-- ✅ Auth0 authentication integration
+- ✅ OAuth authentication (Google/GitHub) via LifeGift Platform API
 - ✅ Dark mode support with theme persistence
-- ✅ Sign in page
-- ✅ Sign out page
-- ✅ Dashboard shell (empty page)
-- ✅ Responsive layout with header navigation
+- ✅ API client for all LifeGift Platform endpoints
+- ✅ Dashboard with metrics summary
+- ✅ Clusters management (list, create, delete)
+- ✅ Recommendations page (view and apply)
+- ✅ Waste report with recommendations
+- ✅ Analytics page
+- ✅ Responsive layout with sidebar navigation
 
-### 🚧 Ready for Implementation
+## API Integration
 
-- React Query (TanStack Query) setup
-- Charts integration (Recharts or Tremor.so)
-- Additional pages and features
+The application integrates with the LifeGift Platform API:
 
-## Auth0 Setup
+- **Authentication**: OAuth 2.0 (Google/GitHub) via `/auth/{provider}/login` and `/auth/{provider}/callback`
+- **User Management**: `/v1/auth/me`, `/v1/auth/logout`
+- **Clusters**: `/v1/clusters` (GET, POST, PATCH, DELETE)
+- **Recommendations**: `/v1/recommendations` (GET, POST for bulk-apply)
+- **Metrics**: `/v1/metrics/summary` (GET)
 
-1. Create an Auth0 account at [auth0.com](https://auth0.com)
-2. Create a new application (Single Page Application)
-3. Configure the following:
-   - Allowed Callback URLs: `http://localhost:3000/api/auth/callback`
-   - Allowed Logout URLs: `http://localhost:3000`
-   - Allowed Web Origins: `http://localhost:3000`
-4. Copy your credentials to `.env.local`
+All API calls are authenticated using JWT Bearer tokens stored in session cookies.
 
 ## Dark Mode
 

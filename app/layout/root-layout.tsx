@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { UserProvider } from "@auth0/nextjs-auth0/client"
 import { Moon, Sun, LogOut, User } from "lucide-react"
 import { Button } from "@/app/components/ui/button"
 import { Badge } from "@/app/components/ui/badge"
@@ -14,9 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/app/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/app/components/ui/avatar"
-import { useUser } from "@auth0/nextjs-auth0/client"
-import { MockAuthProvider, useMockUser } from "@/app/providers/mock-auth-provider"
-import { isAuth0Configured } from "@/lib/auth-config"
+import { AuthProvider, useAuth } from "@/app/providers/auth-provider"
 import { useRouter } from "next/navigation"
 import { Sidebar, MobileSidebar } from "@/app/components/sidebar"
 import { Sheet, SheetContent, SheetTrigger } from "@/app/components/ui/sheet"
@@ -97,37 +94,29 @@ export function RootLayout({ children }: { children: React.ReactNode }) {
     return null
   }
 
-  // For UI development/demo mode, we'll use mock auth
-  const useAuth0 = false
-
-  const AuthWrapper = useAuth0 ? UserProvider : MockAuthProvider
-
   return (
-    <AuthWrapper>
-      <AuthAwareLayout useAuth0={useAuth0} darkMode={darkMode} toggleDarkMode={toggleDarkMode}>
+    <AuthProvider>
+      <AuthAwareLayout darkMode={darkMode} toggleDarkMode={toggleDarkMode}>
         {children}
       </AuthAwareLayout>
-    </AuthWrapper>
+    </AuthProvider>
   )
 }
 
 function AuthAwareLayout({ 
   children, 
-  useAuth0, 
   darkMode, 
   toggleDarkMode 
 }: { 
   children: React.ReactNode
-  useAuth0: boolean
   darkMode: boolean
   toggleDarkMode: () => void
 }) {
-  const auth0User = useAuth0 ? useUser() : { user: undefined, isLoading: false }
-  const mockAuth = !useAuth0 ? useMockUser() : { user: undefined, isLoading: false }
+  const auth = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   
-  const user = useAuth0 ? auth0User.user : mockAuth.user
-  const isLoading = useAuth0 ? auth0User.isLoading : mockAuth.isLoading
+  const user = auth.user
+  const isLoading = auth.isLoading
 
   // Show full layout only when authenticated
   if (isLoading) {
@@ -167,11 +156,6 @@ function AuthAwareLayout({
                 <MobileSidebar onNavigate={() => setMobileMenuOpen(false)} />
               </SheetContent>
             </Sheet>
-            {!useAuth0 && (
-              <Badge variant="outline" className="hidden md:inline-flex">
-                Demo Mode
-              </Badge>
-            )}
           </div>
           <div className="flex items-center gap-2 md:gap-4">
             <Button
@@ -186,7 +170,7 @@ function AuthAwareLayout({
                 <Moon className="h-5 w-5" />
               )}
             </Button>
-            <UserMenu useAuth0={useAuth0} />
+            <UserMenu />
           </div>
         </header>
         <main className="flex-1 overflow-y-auto">{children}</main>
@@ -195,19 +179,16 @@ function AuthAwareLayout({
   )
 }
 
-function UserMenu({ useAuth0 }: { useAuth0: boolean }) {
-  const auth0User = useAuth0 ? useUser() : { user: undefined, isLoading: false }
-  const mockAuth = !useAuth0 ? useMockUser() : { user: undefined, isLoading: false, logout: () => {}, login: () => {} }
+function UserMenu() {
+  const auth = useAuth()
   const router = useRouter()
   
-  const user = useAuth0 ? auth0User.user : mockAuth.user
-  const isLoading = useAuth0 ? auth0User.isLoading : mockAuth.isLoading
+  const user = auth.user
+  const isLoading = auth.isLoading
 
-  const handleLogout = () => {
-    if (!useAuth0 && mockAuth.logout) {
-      mockAuth.logout()
-      router.push("/pages/signin")
-    }
+  const handleLogout = async () => {
+    await auth.logout()
+    router.push("/pages/signin")
   }
 
   if (isLoading) {
@@ -216,7 +197,7 @@ function UserMenu({ useAuth0 }: { useAuth0: boolean }) {
 
   if (!user) {
     return (
-      <Link href={useAuth0 ? "/api/auth/login" : "/pages/signin"}>
+      <Link href="/pages/signin">
         <Button>Sign In</Button>
       </Link>
     )
@@ -227,7 +208,7 @@ function UserMenu({ useAuth0 }: { useAuth0: boolean }) {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-10 w-10 rounded-full">
           <Avatar className="h-10 w-10">
-            <AvatarImage src={user.picture || undefined} alt={user.name || "User"} />
+            <AvatarImage src={user.avatar_url || undefined} alt={user.name || "User"} />
             <AvatarFallback>
               {user.name?.charAt(0).toUpperCase() || "U"}
             </AvatarFallback>
@@ -241,6 +222,9 @@ function UserMenu({ useAuth0 }: { useAuth0: boolean }) {
             <p className="text-xs leading-none text-muted-foreground">
               {user.email}
             </p>
+            <Badge variant="outline" className="mt-1 w-fit text-xs">
+              {user.plan_tier}
+            </Badge>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
@@ -251,19 +235,10 @@ function UserMenu({ useAuth0 }: { useAuth0: boolean }) {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        {useAuth0 ? (
-          <DropdownMenuItem asChild>
-            <Link href="/api/auth/logout" className="flex items-center text-destructive">
-              <LogOut className="mr-2 h-4 w-4" />
-              <span>Log out</span>
-            </Link>
-          </DropdownMenuItem>
-        ) : (
-          <DropdownMenuItem onClick={handleLogout} className="text-destructive">
-            <LogOut className="mr-2 h-4 w-4" />
-            <span>Log out</span>
-          </DropdownMenuItem>
-        )}
+        <DropdownMenuItem onClick={handleLogout} className="text-destructive">
+          <LogOut className="mr-2 h-4 w-4" />
+          <span>Log out</span>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )
